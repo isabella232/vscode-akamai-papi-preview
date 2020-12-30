@@ -1,0 +1,25 @@
+:root {
+  --previewpanel-spacing: 10px;
+}
+
+.previewpanel {
+  width: 100vw;
+  height: 100vh;
+  padding: var(--previewpanel-spacing);
+  display: grid;
+  grid-template-columns: 25% 1fr 25%;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--previewpanel-spacing) var(--previewpanel-spacing);
+}
+
+.previewpanel > .actionbar {
+  grid-column-start: 1;
+  grid-column-end: 4;
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+
+.previewpanel > .column {
+  grid-row-start: 2;
+  grid-row-end: 3;
+}

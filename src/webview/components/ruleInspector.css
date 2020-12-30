@@ -1,0 +1,7 @@
+
+.ruleinspector h2 + * {
+  margin-left: 0;
+}
+.atominspector-name {
+  margin: 0px;
+}

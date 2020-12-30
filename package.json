@@ -1,31 +1,39 @@
 {
-	"name": "akamai-papilang",
-	"displayName": "vscode-akamai-papilang",
+	"name": "akamai-papi-preview",
+	"displayName": "Akamai PAPI Preview",
 	"description": "Unofficial Akamai Property JSON helper",
 	"version": "0.0.1",
+	"publisher": "ynohat",
 	"engines": {
 		"vscode": "^1.52.0"
 	},
 	"categories": [
-		"Other"
+		"Visualization"
 	],
 	"activationEvents": [
-		"onCommand:akamai-papilang.helloWorld"
+		"onCommand:akamai-papi-preview.preview"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "akamai-papilang.helloWorld",
-				"title": "Hello World"
+				"command": "akamai-papi-preview.preview",
+				"title": "Preview",
+				"category": "Akamai PAPI"
 			}
 		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
-		"compile": "webpack --config ./build/node-extension.webpack.config.js",
-		"watch": "webpack --watch --config ./build/node-extension.webpack.config.js",
-		"package": "webpack --mode production --devtool hidden-source-map --config ./build/node-extension.webpack.config.js",
+		"compile": "npm-run-all compile:*",
+		"compile:extension": "webpack --config ./build/node-extension.webpack.config.js",
+		"compile:webviews": "webpack --config ./build/webviews.webpack.config.js",
+		"watch": "npm-run-all watch:*",
+		"watch:extension": "webpack --watch --config ./build/node-extension.webpack.config.js",
+		"watch:webviews": "webpack --watch --mode development --config ./build/webviews.webpack.config.js",
+		"package": "npm-run-all package:*",
+		"package:extension": "webpack --mode production --devtool hidden-source-map --config ./build/node-extension.webpack.config.js",
+		"package:webviews": "webpack --mode production --devtool hidden-source-map --config ./build/webviews.webpack.config.js",
 		"test-compile": "tsc -p ./",
 		"test-watch": "tsc -watch -p ./",
 		"pretest": "npm run test-compile && npm run lint",
@@ -33,19 +41,37 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.52.0",
 		"@types/glob": "^7.1.3",
+		"@types/highlightjs": "^10.1.0",
+		"@types/js-yaml": "^3.12.5",
 		"@types/mocha": "^8.0.4",
 		"@types/node": "^12.11.7",
-		"eslint": "^7.15.0",
+		"@types/react": "^17.0.0",
+		"@types/react-dom": "^17.0.0",
+		"@types/vscode": "^1.52.0",
+		"@types/xml-formatter": "^2.1.1",
 		"@typescript-eslint/eslint-plugin": "^4.9.0",
 		"@typescript-eslint/parser": "^4.9.0",
+		"css-loader": "^5.0.1",
+		"eslint": "^7.15.0",
+		"file-loader": "^6.2.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.3",
+		"npm-run-all": "^4.1.5",
+		"style-loader": "^2.0.0",
+		"ts-loader": "^8.0.12",
 		"typescript": "^4.1.2",
 		"vscode-test": "^1.4.1",
-		"ts-loader": "^8.0.11",
-		"webpack": "^5.10.0",
+		"webpack": "^5.11.1",
 		"webpack-cli": "^4.2.0"
+	},
+	"dependencies": {
+		"classnames": "^2.2.6",
+		"highlightjs": "^9.16.2",
+		"js-yaml": "^3.14.1",
+		"react": "^17.0.1",
+		"react-dom": "^17.0.1",
+		"vscode-codicons": "0.0.13",
+		"xml-formatter": "^2.4.0"
 	}
 }

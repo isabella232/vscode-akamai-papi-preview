@@ -1,0 +1,57 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul[class],
+ol[class],
+li,
+figure,
+figcaption,
+blockquote,
+header,
+dl,
+dd {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1rem;
+}
+h2 {
+  margin-top: 1em;
+  font-size: 0.9rem;
+}
+h3, h4, h5, h6 {
+  font-size: 0.8rem;
+}
+
+html, body {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+  padding: 0px;
+}
+
+blockquote > pre {
+  margin: 0px;
+  padding: 0px;
+  white-space: pre-wrap;
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}

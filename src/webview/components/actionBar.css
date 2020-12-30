@@ -1,0 +1,19 @@
+
+.actionbar {
+  font-size: 1rem;
+  line-height: 2rem;
+  /* border-bottom: 1px solid var(--vscode-peekView-border);
+  border-top: 1px solid var(--vscode-peekView-border); */
+  background: var(--vscode-quickInput-background);
+}
+
+.actionbar .actionbutton {
+  background: none;
+  color: var(--vscode-foreground);
+  border: none;
+  outline: none;
+  user-select: none;
+}
+.actionbar .actionbutton > * {
+  vertical-align: sub;
+}

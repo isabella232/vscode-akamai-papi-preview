@@ -1,0 +1,38 @@
+
+.ruletree-node {
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+  margin-left: 0.5em;
+  border-left: 0.5px solid var(--vscode-tree-indentGuidesStroke);
+}
+
+.ruletree-node.root {
+  margin-left: 0em;
+  border-left: none;
+}
+
+.ruletree-node header {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.ruletree-node header * {
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.ruletree-node.selected > header > h2 {
+  background: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+}
+
+.ruletree-node h2 {
+  font-weight: normal;
+  font-size: 1em;
+  margin: 0px;
+  padding-left: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
