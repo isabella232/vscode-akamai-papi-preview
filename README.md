@@ -16,11 +16,11 @@ The extension does not need any API credentials configured.
 
 ### Simple Explorer
 
-![](images/human.png)
+![](https://raw.githubusercontent.com/akamai-contrib/vscode-akamai-papi-preview/main/images/human.png)
 
 ### View rule as JSON
 
-![](images/json.png)
+![](https://raw.githubusercontent.com/akamai-contrib/vscode-akamai-papi-preview/main/images/json.png)
 
 ## Release Notes
 
