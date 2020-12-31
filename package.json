@@ -4,6 +4,10 @@
 	"description": "Unofficial Akamai Property JSON helper",
 	"version": "0.0.1",
 	"publisher": "ynohat",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/akamai-contrib/vscode-akamai-papi-preview"
+	},
 	"engines": {
 		"vscode": "^1.52.0"
 	},
