@@ -61,10 +61,20 @@ class PreviewPanel extends React.Component<PreviewPanelProps, PreviewPanelState>
 }
 
 const vscode = window.acquireVsCodeApi();
-const initialData = window.initialData;
-const property = new Property(initialData);
 
-ReactDOM.render(
-  <PreviewPanel vscode={vscode} property={property} />,
-  document.querySelector("body")
-);
+try {
+  const initialData = JSON.parse(window.initialData);
+  const property = new Property(initialData);
+
+  ReactDOM.render(
+    <PreviewPanel vscode={vscode} property={property} />,
+    document.querySelector("body")
+  );
+} catch (e) {
+  ReactDOM.render(
+    <pre className="error" style={{whiteSpace: "pre"}}>
+      {e.name}: {e.message}
+    </pre>,
+    document.querySelector("body")
+  );
+}
