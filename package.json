@@ -2,7 +2,7 @@
 	"name": "akamai-papi-preview",
 	"displayName": "Akamai PAPI Preview",
 	"description": "Unofficial Akamai Property JSON helper",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"publisher": "ynohat",
 	"repository": {
 		"type": "git",
