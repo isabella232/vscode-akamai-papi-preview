@@ -131,14 +131,31 @@ class BehaviorsInspector extends React.Component<{ behaviors: any[]}> {
   }
 }
 
-class AtomInspector extends React.Component<{ atom: any }> {
+class AtomInspector extends React.Component<{ atom: {name: string, options: any} }> {
   render() {
     return (
       <div className="atominspector">
         <h3 className="atominspector-name">{this.props.atom.name}</h3>
-        <Highlighter language="YAML" code={YAML.safeDump(this.props.atom.options)} />
+        {this.renderOptions()}
       </div>
     );
+  }
+
+  renderOptions() {
+    switch (this.props.atom.name) {
+      case "advanced":
+        const {description, xml} = this.props.atom.options;
+        return (
+          <div className="hljs">
+            <span className="hljs-attr">description:</span> <span className="hljs-string">{description}</span>{"\n"}
+            <span className="hljs-attr">xml:</span> <Highlighter language="XML" code={xml} />{"\n"}
+          </div>
+        );
+      default:
+        return (
+          <Highlighter language="YAML" code={YAML.safeDump(this.props.atom.options)} />
+        );
+    }
   }
 }
 
