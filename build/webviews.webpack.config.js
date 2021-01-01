@@ -7,7 +7,7 @@ module.exports = {
     "preview-panel": "./src/webview/previewPanel.tsx"
   },
   output: {
-    path: path.resolve(__dirname, "..", "media"),
+    path: path.resolve(__dirname, "..", "dist"),
     filename: "[name].js"
   },
   // devtool: "eval-source-map",

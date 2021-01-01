@@ -66,7 +66,7 @@ class PreviewPanel {
 			<script>
 				window.initialData = ${this.initialData};
 			</script>
-			<script src="${this.getUri("media", "preview-panel.js")}"></script>
+			<script src="${this.getUri("dist", "preview-panel.js")}"></script>
 			</html>
 		`;
 	}
