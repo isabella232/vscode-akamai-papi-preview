@@ -129,8 +129,8 @@ export class AdvancedOverrideRule implements Rule {
 
 export class DefaultRule extends StandardRule {
   variables: Variable[];
-  customOverride: CustomOverrideRule;
-  advancedOverride: AdvancedOverrideRule;
+  customOverride: CustomOverrideRule = null;
+  advancedOverride: AdvancedOverrideRule = null;
 
   constructor(data: any, pointer: string) {
     super(data, pointer);

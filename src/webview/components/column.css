@@ -2,9 +2,9 @@
   max-height: 100%;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto 1fr;
   gap: 5px 0px;
 }
 .column-scroll {
-  overflow-y: scroll;
+  overflow-y: auto;
 }

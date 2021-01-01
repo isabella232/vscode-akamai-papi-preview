@@ -1,0 +1,43 @@
+.treeview-node {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+  margin-left: 8px;
+  border-left: 0.5px solid var(--vscode-tree-indentGuidesStroke);
+}
+
+.treeview-node.root {
+  margin-left: 0;
+  border-left: none;
+}
+
+.treeview-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.treeview-expandbutton, .treeview-label {
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.treeview-node > .treeview-header > .codicon::before {
+  margin-top: 10px;
+}
+
+.treeview-node.root > .treeview-header > .treeview-expandbutton {
+  visibility: hidden;
+}
+
+.treeview-label {
+  font-weight: normal;
+  font-size: 1em;
+  margin: 0px;
+  padding-left: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.treeview-node.focused > .treeview-header > .treeview-label {
+  background: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+}
