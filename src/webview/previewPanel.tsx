@@ -9,8 +9,6 @@ import RuleInspector from "./components/ruleInspector";
 import VariablesInspector from "./components/variablesInspector";
 import { Property, Rule } from "./model/papi";
 import { DisplayMode } from "./model/displayMode";
-import ActionBar from "./components/actionBar";
-import ToggleDisplayMode from "./components/actions/toggleDisplayMode";
 
 declare global {
   interface Window {
@@ -41,21 +39,18 @@ class PreviewPanel extends React.Component<PreviewPanelProps, PreviewPanelState>
   render() {
     return (
       <div className="previewpanel">
-        <ActionBar>
-          <ToggleDisplayMode displayMode={this.state.displayMode} onToggle={this.onToggleDisplayMode.bind(this)} />
-        </ActionBar>
-        <RuleTree rule={this.props.property.defaultRule} onFocus={this.onFocus.bind(this)} selectedRule={this.state.selectedRule} />
-        <RuleInspector rule={this.state.selectedRule} displayMode={this.state.displayMode} />
+        <RuleTree rule={this.props.property.defaultRule} onFocus={this.onFocus} selectedRule={this.state.selectedRule} />
+        <RuleInspector rule={this.state.selectedRule} displayMode={this.state.displayMode} onToggleDisplayMode={this.onToggleDisplayMode} />
         <VariablesInspector variables={this.props.property.variables} />
       </div>
     );
   }
 
-  onToggleDisplayMode(displayMode: DisplayMode) {
+  onToggleDisplayMode = (displayMode: DisplayMode) => {
     this.setState({displayMode});
   }
 
-  onFocus(selectedRule: Rule) {
+  onFocus = (selectedRule: Rule) => {
     this.setState({selectedRule});
   }
 }

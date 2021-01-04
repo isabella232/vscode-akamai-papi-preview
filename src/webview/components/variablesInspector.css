@@ -1,0 +1,4 @@
+.column.variablesinspector .column-title {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}

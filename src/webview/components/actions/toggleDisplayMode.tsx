@@ -26,10 +26,7 @@ export default class ToggleDisplayMode extends React.Component<ToggleDisplayMode
         break;
     }
     return (
-      <button className="actionbutton toggledisplaymode" onClick={() => this.props.onToggle(nextDisplayMode)}>
-        <Icon icon={icon} />
-        {label}
-      </button>
+      <Icon icon={icon} title={label} onClick={() => this.props.onToggle(nextDisplayMode)} />
     );
   }
 }

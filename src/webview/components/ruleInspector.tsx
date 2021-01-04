@@ -6,10 +6,12 @@ import Highlighter from "./highlighter";
 
 import "./ruleInspector.css";
 import { DisplayMode } from "../model/displayMode";
+import ToggleDisplayMode from "./actions/toggleDisplayMode";
 
 interface RuleInspectorProps {
   rule: Rule;
   displayMode: DisplayMode;
+  onToggleDisplayMode: (displayMode: DisplayMode) => void;
 }
 
 export default class RuleInspector extends React.Component<RuleInspectorProps, {asJSON: boolean}> {
@@ -18,8 +20,21 @@ export default class RuleInspector extends React.Component<RuleInspectorProps, {
   }
 
   render() {
+    const title = (
+      <React.Fragment>
+        <span>
+          {this.props.rule.name}
+        </span>
+        <span className="toolbar" style={{textAlign: "right"}}>
+          <ToggleDisplayMode displayMode={this.props.displayMode} onToggle={this.props.onToggleDisplayMode} />
+        </span>
+      </React.Fragment>
+    );
+
+
+
     return (
-      <Column title={this.props.rule.name} className="ruleinspector">
+      <Column title={title} className="ruleinspector">
         <p>{this.props.rule.breadcrumb}</p>
         <hr />
         {this.renderRule(this.props.rule)}

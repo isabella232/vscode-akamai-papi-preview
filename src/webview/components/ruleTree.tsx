@@ -67,10 +67,14 @@ export default class RuleTree extends React.Component<RuleTreeProps, RuleTreeSta
   render() {
     const title = (
       <React.Fragment>
-        Outline
+        <span>
+          <Icon icon="list-tree" />
+          &nbsp;
+          Outline
+        </span>
         <span className="toolbar" style={{textAlign: "right"}}>
-          <Icon icon="expand-all" onClick={this.expandAll} />
-          <Icon icon="collapse-all" onClick={this.collapseAll} />
+          <Icon icon="expand-all" title="Expand all" onClick={this.expandAll} />
+          <Icon icon="collapse-all" title="Collapse all" onClick={this.collapseAll} />
         </span>
       </React.Fragment>
     );
