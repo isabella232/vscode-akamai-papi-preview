@@ -1,73 +1,9 @@
 import * as rfc6902 from "rfc6902";
+import {Pointer, PointerEvaluation} from "rfc6902/pointer";
+import * as ops from "rfc6902/diff";
 import * as jsondiffpatch from "jsondiffpatch";
 
 export const DELETIONS = Symbol("deletions");
-
-class PatchOp {
-  static isAddOrReplace(op: PatchOp) {
-    return op instanceof ReplaceOp || op instanceof AddOp;
-  }
-}
-class ReplaceOp extends PatchOp {
-  left: any;
-  right: any;
-  constructor(left: any, right: any) {
-    super();
-    this.left = PatchOp.isAddOrReplace(left) ? left.right : left;
-    this.right = PatchOp.isAddOrReplace(right) ? right.right : right;
-  }
-}
-class AddOp extends PatchOp {
-  right: any;
-  constructor(right: any) {
-    super();
-    this.right = PatchOp.isAddOrReplace(right) ? right.right : right;
-  }
-}
-
-function diffingProxy<T extends object>(obj: T): T {
-  const proxy = new Proxy(obj, {
-    get: (target, k, receiver) => {
-      if (k === "__proxyTarget") {
-        return obj;
-      }
-      return Reflect.get(target, k, receiver);
-    },
-
-    set: (target, k, v, receiver): boolean => {
-      if (typeof k !== "symbol") {
-        //@ts-expect-error
-        if (!Array.isArray(target) || !isNaN(k)) {
-          if (k in target) {
-            const left = Reflect.get(target, k, receiver);
-            v = new ReplaceOp(left, v);
-          } else {
-            v = new AddOp(v);
-          }
-        }
-      }
-      return Reflect.set(target, k, v, receiver);
-    },
-
-    deleteProperty: (target, k): boolean => {
-      if (typeof k !== "symbol") {
-        //@ts-expect-error
-        if (!Array.isArray(target) || !isNaN(k)) {
-          target[DELETIONS] = target[DELETIONS] || {};
-          var old = Reflect.get(target, k);
-          if (old instanceof ReplaceOp) {
-            old = old.left;
-          } else if (old instanceof AddOp) {
-            old = old.right;
-          }
-          target[DELETIONS][k] = old;
-        }
-      }
-      return Reflect.deleteProperty(target, k);
-    }
-  });
-  return proxy;
-}
 
 export function diff(left: object, right: object) {
   // jsondiffpatch creates very compact patches and provides
@@ -82,10 +18,107 @@ export function diff(left: object, right: object) {
   return jsondiffpatch.formatters.jsonpatch.format(delta, left);
 }
 
-export function patch(obj: object, patch: rfc6902.Operation[]): object {
-  obj = JSON.parse(JSON.stringify(obj), (k, v) => {
-    return typeof v === "object" ? diffingProxy(v) : v;
-  })
-  rfc6902.applyPatch(obj, patch);
-  return obj["__proxyTarget"];
+export function patch(obj: object, patches: rfc6902.Operation[]): object {
+  const patchAnnotator = new PatchAnnotator(obj);
+  return patchAnnotator.process(patches).finalize();
+}
+
+class PatchAnnotator {
+  obj: any;
+  withDeletions: any[];
+
+  constructor(obj: any) {
+    this.obj = obj;
+    this.withDeletions = [];
+  }
+
+  process(patches: rfc6902.Operation[]): PatchAnnotator {
+    patches.forEach(patch => this[patch.op](patch));
+    return this;
+  }
+
+  evaluate(path: string): PointerEvaluation {
+    return Pointer.fromJSON(path).evaluate(this.obj);
+  }
+
+  add(op: ops.AddOperation) {
+    const evaluation = this.evaluate(op.path);
+    if (Array.isArray(evaluation.parent)) {
+      evaluation.parent.splice(+evaluation.key, 0, new AddAnnotation(op.value));
+    } else {
+      evaluation.parent[evaluation.key] = new AddAnnotation(op.value);
+    }
+  }
+
+  replace(op: ops.ReplaceOperation) {
+    const evaluation = this.evaluate(op.path);
+    if (Array.isArray(evaluation.parent)) {
+      evaluation.parent[+evaluation.key] = new ReplaceAnnotation(evaluation.value, op.value);
+    } else {
+      evaluation.parent[evaluation.key] = new ReplaceAnnotation(evaluation.value, op.value);
+    }
+  }
+
+  move(op: ops.MoveOperation) {
+    const fromEvaluation = this.evaluate(op.from);
+    this.remove({op: "remove", path: op.from});
+    this.add({op: "add", path: op.path, value: fromEvaluation.value});
+  }
+
+  remove(op: ops.RemoveOperation) {
+    const evaluation = this.evaluate(op.path);
+    if (evaluation.parent[DELETIONS] === undefined) {
+      evaluation.parent[DELETIONS] = {};
+      this.withDeletions.push(evaluation.parent);
+    }
+    evaluation.parent[DELETIONS][evaluation.key] = evaluation.value;
+    if (Array.isArray(evaluation.parent)) {
+      evaluation.parent.splice(+evaluation.key, 1);
+    } else {
+      delete evaluation.parent[evaluation.key];
+    }
+  }
+
+  finalize(): any {
+    this.withDeletions.forEach(parent => {
+      Object.entries(parent[DELETIONS]).forEach(([k, v]) => {
+        if (Array.isArray(parent)) {
+          parent.splice(+k, 0, new DeleteAnnotation(v));
+        } else {
+          parent[k] = new DeleteAnnotation(v);
+        }
+      });
+      delete parent[DELETIONS];
+    });
+    return this.obj;
+  }
+}
+
+export class PatchAnnotation {
+}
+
+export class ReplaceAnnotation extends PatchAnnotation {
+  left: any;
+  right: any;
+  constructor(left: any, right: any) {
+    super();
+    this.left = left;
+    this.right = right;
+  }
+}
+
+export class AddAnnotation extends PatchAnnotation {
+  value: any;
+  constructor(value: any) {
+    super();
+    this.value = value;
+  }
+}
+
+export class DeleteAnnotation extends PatchAnnotation {
+  value: any;
+  constructor(value: any) {
+    super();
+    this.value = value;
+  }
 }
