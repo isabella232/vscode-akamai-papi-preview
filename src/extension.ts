@@ -68,7 +68,7 @@ class PreviewPanel {
 			<body>
 			</body>
 			<script>
-				window.initialData = ${JSON.stringify(this.initialData)};
+				window.initialData = ${JSON.stringify(escape(this.initialData))};
 			</script>
 			<script src="${this.getUri("dist", "preview-panel.js")}"></script>
 			</html>
