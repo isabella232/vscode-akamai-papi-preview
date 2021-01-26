@@ -6,10 +6,29 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Run jsdiff",
-			"type": "node",
+			"name": "Run Extension",
+			"type": "extensionHost",
 			"request": "launch",
-			"program": "${workspaceFolder}/dist/jsdiff.js"
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			],
+			"preLaunchTask": "${defaultBuildTask}"
+		},
+		{
+			"name": "Extension Tests",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/test/**/*.js"
+			],
+			"preLaunchTask": "npm: test-watch"
 		}
 	]
 }
