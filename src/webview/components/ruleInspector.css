@@ -1,3 +1,7 @@
+.column.ruleinspector.Removed {
+  background: var(--vscode-diffEditor-removedTextBackground);
+}
+
 .column.ruleinspector .column-title {
   display: grid;
   grid-template-columns: 1fr auto;

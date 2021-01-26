@@ -6,21 +6,25 @@ import ToggleButton from "./toggleButton";
 
 import "./treeView.css";
 import Icon from "./icon";
+import { MaybeChanged } from "../model/compare";
+import { MaybeChangedInline } from "./maybeChanged";
 
 export abstract class Node extends events.EventEmitter {
   static get EVENT_EXPANDED_CHANGE(): string { return "expanded-change"; }
   static get EVENT_FOCUSED_CHANGE(): string { return "focused-change"; }
 
-  readonly label: string;
+  readonly label: MaybeChanged<string>;
+  readonly className: any;
   readonly data: any;
   readonly children: Array<Node> = [];
 
   private _isExpanded: boolean = false;
   private _isFocused: boolean = false;
 
-  protected constructor(label: string, data: any) {
+  protected constructor(label: MaybeChanged<string>, className: any, data: any) {
     super();
     this.label = label;
+    this.className = className;
     this.data = data;
   }
 
@@ -64,8 +68,8 @@ export class RootNode extends Node {
   readonly nodes: Array<Node> = [];
   private _focusedNode: Node;
 
-  constructor(label: string, data: any = null) {
-    super(label, data);
+  constructor(label: MaybeChanged<string>, className: any, data: any = null) {
+    super(label, className, data);
     this._focusedNode = null;
     this.register(this);
   }
@@ -117,8 +121,8 @@ export class RootNode extends Node {
 export class ChildNode extends Node {
   readonly parent: Node;
 
-  constructor(parent: Node, label: string, data: any = null) {
-    super(label, data);
+  constructor(parent: Node, label: MaybeChanged<string>, className: any, data: any = null) {
+    super(label, className, data);
     this.parent = parent;
     this.root.register(this);
   }
@@ -179,7 +183,7 @@ class NodeView extends React.Component<NodeViewProps, NodeViewState> {
       focused: this.props.node.isFocused,
       root: this.props.node.isRoot,
       leaf: this.props.node.isLeaf,
-    }, this.props.className);
+    }, this.props.className, this.props.node.className);
     return (
       <div className={classes}>
         {this.renderLabel()}
@@ -193,7 +197,7 @@ class NodeView extends React.Component<NodeViewProps, NodeViewState> {
       <header className="treeview-header">
         {this.renderIcon()}
         <h2 className="treeview-label" onClick={() => this.props.node.isFocused = true}>
-          {this.props.node.label}
+          <MaybeChangedInline value={this.props.node.label} />
         </h2>
       </header>
     );

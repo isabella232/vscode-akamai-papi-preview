@@ -2,66 +2,22 @@ import * as React from "react";
 import Column from "./column";
 
 import "./ruleTree.css";
-import { DefaultRule, Rule, StandardRule } from "../model/papi";
-import TreeView, { ChildNode, Node, RootNode } from "./treeView";
+import TreeView, { Node, RootNode } from "./treeView";
 import Icon from "./icon";
 
 interface RuleTreeProps {
-  rule: DefaultRule;
-  onFocus: Function;
-  selectedRule: Rule;
-}
-
-interface RuleTreeState {
   rootNode: RootNode;
+  onFocus: Function;
+  selectedNode: Node;
 }
 
-export default class RuleTree extends React.Component<RuleTreeProps, RuleTreeState> {
-  expandAll = () => this.state.rootNode.expandAll();
-  collapseAll = () => this.state.rootNode.collapseAll(node => node.depth > 0);
-  onFocus = (node) => this.props.onFocus(node.data);
-
-  constructor(props) {
-    super(props);
-
-    const rootNode = new RootNode(props.rule.name, props.rule);
-    function build(parentNode: Node, children: Array<StandardRule>) {
-      children.forEach((child: StandardRule) => {
-        const childNode = new ChildNode(parentNode, child.name, child);
-        parentNode.appendNode(childNode);
-        build(childNode, child.children);
-      });
-      return parentNode;
-    }
-    build(rootNode, props.rule.children);
-    if (this.props.rule.customOverride) {
-      rootNode.appendNode(new ChildNode(
-        rootNode,
-        "Custom Override",
-        this.props.rule.customOverride
-      ));
-    }
-    if (this.props.rule.advancedOverride) {
-      rootNode.appendNode(new ChildNode(
-        rootNode,
-        "Advanced Override",
-        this.props.rule.advancedOverride
-      ));
-    }
-
-    rootNode.isExpanded = true;
-
-    rootNode.nodes.forEach(node => {
-      if (node.data === this.props.selectedRule) {
-        node.isFocused = true;
-      }
-    });
-
-    this.state = { rootNode };
-  }
+export default class RuleTree extends React.Component<RuleTreeProps> {
+  expandAll = () => this.props.rootNode.expandAll();
+  collapseAll = () => this.props.rootNode.collapseAll(node => node.depth > 0);
+  onFocus = (node) => this.props.onFocus(node);
 
   componentDidMount() {
-    this.state.rootNode.on(RootNode.EVENT_FOCUS_CHANGE, this.onFocus);
+    this.props.rootNode.on(RootNode.EVENT_FOCUS_CHANGE, this.onFocus);
   }
 
   render() {
@@ -80,7 +36,7 @@ export default class RuleTree extends React.Component<RuleTreeProps, RuleTreeSta
     );
     return (
       <Column title={title} className="ruletree">
-        <TreeView root={this.state.rootNode} />
+        <TreeView root={this.props.rootNode} />
       </Column>
     )
   }

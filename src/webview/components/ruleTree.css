@@ -2,3 +2,10 @@
   display: grid;
   grid-template-columns: 1fr auto;
 }
+
+.column.ruletree .treeview-node.Added {
+  background: var(--vscode-diffEditor-insertedTextBackground);
+}
+.column.ruletree .treeview-node.Removed {
+  background: var(--vscode-diffEditor-removedTextBackground);
+}

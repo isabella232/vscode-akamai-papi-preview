@@ -1,6 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as fs from "fs";
+import * as path from "path";
+
+const debug = vscode.window.createOutputChannel("PAPI Preview");
+debug.show();
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -49,7 +54,10 @@ class PreviewPanel {
 	}
 
 	private get initialData(): any {
-		return vscode.window.activeTextEditor?.document.getText();
+		return JSON.stringify({
+			left: JSON.parse(fs.readFileSync("/Users/ahogg/git/vscode-akamai-papi-preview/tmp/rules-left.json", "utf8")),
+			right: JSON.parse(fs.readFileSync("/Users/ahogg/git/vscode-akamai-papi-preview/tmp/rules-right.json", "utf8")),
+		});
 	}
 
 	private getUri(...components: string[]): vscode.Uri {
@@ -57,6 +65,7 @@ class PreviewPanel {
 	}
 
 	public create() {
+		debug.append(this.initialData);
 		this.panel.webview.html = `<!DOCTYPE html>
 			<html lang="en">
 			<head>

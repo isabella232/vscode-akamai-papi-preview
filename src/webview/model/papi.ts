@@ -1,28 +1,34 @@
 // each entity will use this symbol to store its pointer
 // to avoid having an instance property that would then
-// be output as YAML or in other property enumeration situations
-const POINTER = Symbol("JSON Pointer");
 
-export class Entity {
-  constructor(data: any, pointer: string) {
-    this[POINTER] = pointer;
+import { Removed, Added, Replaced } from "../diff/types";
+import { maybeChanged, MaybeChanged, maybeChangedArray, MaybeChangedArray } from "./compare";
+
+export abstract class Entity {
+  abstract get displayName(): MaybeChanged<string>;
+}
+
+export class NamedEntity extends Entity {
+  name: MaybeChanged<string>;
+
+  constructor(data: any) {
+    super();
+    this.name = data.name;
   }
 
-  get pointer(): string {
-    return this[POINTER];
+  get displayName(): MaybeChanged<string> {
+    return this.name;
   }
 }
 
-export class Variable extends Entity {
-  name: string;
-  description: string;
-  value: string;
-  sensitive: boolean;
-  hidden: boolean;
+export class Variable extends NamedEntity {
+  description: MaybeChanged<string>;
+  value: MaybeChanged<string>;
+  sensitive: MaybeChanged<boolean>;
+  hidden: MaybeChanged<boolean>;
 
-  constructor(data: any, pointer: string) {
-    super(data, pointer);
-    this.name = data.name;
+  constructor(data: any) {
+    super(data);
     this.description = data.description;
     this.value = data.value;
     this.sensitive = data.sensitive;
@@ -30,13 +36,13 @@ export class Variable extends Entity {
   }
 }
 
-export class Atom extends Entity {
-  name: string;
-  options: any;
+export class Atom extends NamedEntity {
+  uuid: MaybeChanged<string>;
+  options: MaybeChanged<any>;
 
-  constructor(data: any, pointer: string) {
-    super(data, pointer);
-    this.name = data.name;
+  constructor(data: any) {
+    super(data);
+    this.uuid = data.uuid;
     this.options = data.options;
   }
 }
@@ -47,26 +53,23 @@ export class Criterion extends Atom {
 export class Behavior extends Atom {
 }
 
-export interface Rule {
-  name: string;
-  breadcrumb: string;
-}
+export abstract class Rule extends NamedEntity {
+  uuid: MaybeChanged<string>;
+  comments: MaybeChanged<string>;
+  behaviors: MaybeChangedArray<Behavior>;
+  children: MaybeChangedArray<ChildRule>;
 
-export abstract class StandardRule extends Entity implements Rule {
-  name: string;
-  comments: string;
-  behaviors: Behavior[];
-  children: ChildRule[];
-
-  constructor(data: any, pointer: string) {
-    super(data, pointer);
-    this.name = data.name;
+  constructor(data: any) {
+    super(data);
+    this.uuid = data.uuid;
     this.comments = data.comments;
-    this.behaviors = data.behaviors?.map((behavior, idx) => new Behavior(behavior, `${this.pointer}/behaviors/${idx}`)) || [];
-    this.children = data.children?.map((child, idx) => new ChildRule(child, this, `${this.pointer}/children/${idx}`)) || [];
+    if (data.behaviors) {
+      this.behaviors = maybeChangedArray(Behavior, data.behaviors);
+    }
+    if (data.children) {
+      this.children = maybeChangedArray(ChildRule, data.children);
+    }
   }
-
-  abstract breadcrumb: string;
 }
 
 export enum CriteriaMustSatisfy {
@@ -74,89 +77,86 @@ export enum CriteriaMustSatisfy {
   ANY = "any",
 }
 
-const PARENT = Symbol("Parent rule");
+export class ChildRule extends Rule {
+  criteriaMustSatisfy: MaybeChanged<CriteriaMustSatisfy>;
+  criteria: MaybeChangedArray<Criterion>;
 
-export class ChildRule extends StandardRule {
-  parent: StandardRule;
-  criteriaMustSatisfy: CriteriaMustSatisfy;
-  criteria: Criterion[];
-
-  constructor(data: any, parent: StandardRule, pointer: string) {
-    super(data, pointer);
-    this[PARENT] = parent;
-    this.criteria = data.criteria?.map((criterion, idx) => new Criterion(criterion, `${this.pointer}/criteria/${idx}`)) || [];
+  constructor(data: any) {
+    super(data);
+    if (data.criteria) {
+      this.criteria = maybeChangedArray(Criterion, data.criteria);
+    }
     this.criteriaMustSatisfy = data.criteriaMustSatisfy;
   }
-
-  get breadcrumb(): string {
-    return this[PARENT].breadcrumb + " > " + this.name;
-  }
 }
 
-export class CustomOverrideRule implements Rule {
-  customOverride: any;
+export class DefaultRule extends Rule {
+  variables: MaybeChangedArray<Variable> = [];
+  customOverride: MaybeChanged<CustomOverride> = null;
+  advancedOverride: MaybeChanged<AdvancedOverride> = null;
 
-  constructor(data: any, pointer: string) {
-    this[POINTER] = pointer;
-    this.customOverride = data;
-  }
-
-  get name(): string {
-    return "Custom Override";
-  }
-
-  get breadcrumb(): string {
-    return this.name;
-  }
-}
-
-export class AdvancedOverrideRule implements Rule {
-  advancedOverride: string;
-
-  constructor(data: any, pointer: string) {
-    this[POINTER] = pointer;
-    this.advancedOverride = data;
-  }
-
-  get name(): string {
-    return "Advanced Override";
-  }
-
-  get breadcrumb(): string {
-    return this.name;
-  }
-}
-
-export class DefaultRule extends StandardRule {
-  variables: Variable[];
-  customOverride: CustomOverrideRule = null;
-  advancedOverride: AdvancedOverrideRule = null;
-
-  constructor(data: any, pointer: string) {
-    super(data, pointer);
-    this.variables = data.variables?.map((child, idx) => new Variable(child, `${this.pointer}/variables/${idx}`)) || [];
+  constructor(data: any) {
+    super(data);
+    console.log(data);
+    if (data.variables) {
+      this.variables = maybeChangedArray(Variable, data.variables);
+    }
     if (data.customOverride) {
-      this.customOverride = new CustomOverrideRule(data.customOverride, `${this.pointer}/customOverride`);
+      this.customOverride = maybeChanged(CustomOverride, data.customOverride);
     }
     if (data.advancedOverride) {
-      this.advancedOverride = new AdvancedOverrideRule(data.advancedOverride, `${this.pointer}/advancedOverride`);
+      this.advancedOverride = maybeChanged(AdvancedOverride, data.advancedOverride);
     }
   }
+}
 
-  get breadcrumb(): string {
-    return this.name;
+export class CustomOverride extends NamedEntity {
+  overrideId: MaybeChanged<string>;
+
+  constructor(data: any) {
+    super(data);
+    this.overrideId = data.overrideId;
+  }
+
+  get displayName(): MaybeChanged<string> {
+    return "Custom Override";
+  }
+}
+
+export class AdvancedOverride extends Entity {
+  xml: MaybeChanged<string>;
+
+  constructor(data: any) {
+    super();
+    this.xml = data;
+  }
+
+  get displayName(): MaybeChanged<string> {
+    return "Advanced Override";
   }
 }
 
 export class Property extends Entity {
-  defaultRule: DefaultRule;
+  defaultRule: MaybeChanged<DefaultRule>;
 
   constructor(data: any) {
-    super(data, "");
-    this.defaultRule = new DefaultRule(data.rules, "/rules");
+    super();
+    this.defaultRule = maybeChanged(DefaultRule, data.rules);
   }
 
-  get variables(): Variable[] {
-    return this.defaultRule.variables;
+  get variables(): MaybeChangedArray<Variable> {
+    if (this.defaultRule instanceof Removed) {
+      return this.defaultRule.value.variables;
+    } else if (this.defaultRule instanceof Added) {
+      return this.defaultRule.value.variables;
+    } else if (this.defaultRule instanceof Replaced) {
+      return this.defaultRule.right.variables;
+    } else {
+      return this.defaultRule.variables;
+    }
+  }
+
+  get displayName(): MaybeChanged<string> {
+    return "Property";
   }
 }
