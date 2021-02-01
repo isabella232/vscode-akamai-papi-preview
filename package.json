@@ -24,6 +24,11 @@
 				"command": "akamai-papi-preview.preview",
 				"title": "Preview",
 				"category": "Akamai PAPI"
+			},
+			{
+				"command": "akamai-papi-preview.diff-working-copy",
+				"title": "Working Copy Diff",
+				"category": "Akamai PAPI"
 			}
 		]
 	},
