@@ -22,11 +22,11 @@ export class Variable extends Entity {
 
   constructor(data: any, pointer: string) {
     super(data, pointer);
-    this.name = data.name;
-    this.description = data.description;
-    this.value = data.value;
-    this.sensitive = data.sensitive;
-    this.hidden = data.hidden;
+    this.name = data.name || '';
+    this.description = data.description || '';
+    this.value = data.value || '';
+    this.sensitive = !!data.sensitive;
+    this.hidden = !!data.hidden;
   }
 }
 
